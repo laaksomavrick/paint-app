@@ -1,13 +1,6 @@
 import React, { Component } from 'react';
 
 class CanvasSection extends Component {  
-    
-    //register clients in ws
-    //send draw events across ws
-    //save canvas state in server (archive)
-    //get canvas state on join
-
-    //canvas grid, good time for redux perhaps 
 
     constructor(props) {
         super(props)

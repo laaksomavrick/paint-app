@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import './App.css';
+import CanvasSection from './containers/CanvasSection'
 
 class App extends Component {
 
@@ -14,6 +14,7 @@ class App extends Component {
     render() {
         return (
             <div className="App">
+                <CanvasSection/>
             </div>
         );
     }

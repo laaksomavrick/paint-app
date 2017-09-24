@@ -1,8 +1,9 @@
 package main
 
 import (
-	"encoding/json"
 	"net/http"
+	"golang.org/x/net/websocket"
+	"fmt"
 )
 
 const (
@@ -10,13 +11,30 @@ const (
 	PORT = ":3001"
 )
 
-func helloHandler(w http.ResponseWriter, r *http.Request) {
-	m := make(map[string]string)
-	m["hello"] = "worldaaa"
-	json.NewEncoder(w).Encode(m)
+func Echo(ws *websocket.Conn) {
+    var err error
+
+    for {
+        var reply string
+
+        if err = websocket.Message.Receive(ws, &reply); err != nil {
+            fmt.Println("Can't receive")
+            break
+        }
+
+        fmt.Println("Received back from client: " + reply)
+
+        msg := "Received:  " + reply
+        fmt.Println("Sending to client: " + msg)
+
+        if err = websocket.Message.Send(ws, msg); err != nil {
+            fmt.Println("Can't send")
+            break
+        }
+    }
 }
 
 func main() {
-	http.HandleFunc("/", helloHandler)
+	http.Handle("/", websocket.Handler(Echo))
 	http.ListenAndServe(PORT, nil)
 }

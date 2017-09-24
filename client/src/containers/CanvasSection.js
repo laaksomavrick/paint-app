@@ -1,6 +1,13 @@
 import React, { Component } from 'react';
 
-class CanvasSection extends Component {    
+class CanvasSection extends Component {  
+    
+    //register clients in ws
+    //send draw events across ws
+    //save canvas state in server (archive)
+    //get canvas state on join
+
+    //canvas grid, good time for redux perhaps 
 
     constructor(props) {
         super(props)
@@ -19,29 +26,23 @@ class CanvasSection extends Component {
 
     onMouseDown(e) {
         const cx = this.refs.canvas.getContext('2d')
-        let pos = this.relativePos(e, cx.canvas)        
+        const pos = this.relativePos(e, cx.canvas)
+
         cx.moveTo(pos.x, pos.y)       
         this.setState({trackMouseMovement: true})
     }
 
     onMouseMove(e) {
-
         if (this.state.trackMouseMovement) {
-
-            const canvas = this.refs.canvas
-
-            const cx = canvas.getContext('2d')
-
-            let pos = this.relativePos(e, cx.canvas)
+            const cx = this.refs.canvas.getContext('2d')
+            const pos = this.relativePos(e, cx.canvas)
 
             cx.lineJoin = 'round'
             cx.lineWidth = 5
                         
             cx.lineTo(pos.x, pos.y)
             cx.stroke()
-
-        }
-                
+        }   
     }
 
     onMouseUp(e) {
@@ -50,8 +51,10 @@ class CanvasSection extends Component {
 
     relativePos(event, element) {
         var rect = element.getBoundingClientRect();
-        return {x: Math.floor(event.clientX - rect.left),
-                y: Math.floor(event.clientY - rect.top)}
+        return {
+            x: Math.floor(event.clientX - rect.left),
+            y: Math.floor(event.clientY - rect.top)
+        }
     }
 
     render() {
@@ -65,7 +68,7 @@ class CanvasSection extends Component {
                 onMouseMove={this.onMouseMove}
                 onMouseUp={this.onMouseUp}>
             </canvas>
-        );
+        )
     }
 
 }

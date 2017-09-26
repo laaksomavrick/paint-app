@@ -33,16 +33,10 @@ class App extends Component {
 
         socket.onopen = (e) => {
             console.log("on open")
-
-            socket.send(JSON.stringify({
-                'hi': 'hello'
-            }))
-
         }
 
         socket.onmessage = (e) => {
             console.log("on message")
-            console.log(e.data)
         }
 
     }
@@ -56,7 +50,7 @@ class App extends Component {
     render() {
         return (
             <div className="App">
-                <CanvasSection/>
+                <CanvasSection socket={socket}/>
             </div>
         );
     }

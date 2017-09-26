@@ -10,6 +10,7 @@ class CanvasSection extends Component {
         this.onMouseDown = this.onMouseDown.bind(this)
         this.onMouseMove = this.onMouseMove.bind(this)     
         this.onMouseUp = this.onMouseUp.bind(this) 
+        this.update = this.update.bind(this)         
         this.relativePos = this.relativePos.bind(this) 
     }
 
@@ -39,7 +40,20 @@ class CanvasSection extends Component {
     }
 
     onMouseUp(e) {
+        this.update()        
         this.setState({trackMouseMovement: false})
+    }
+
+    update() {
+
+        //may need a better strategy than updating whole canvas per stroke
+
+        const { socket } = this.props   
+        const cx = this.refs.canvas.getContext('2d')
+        const data = cx.getImageData(0,0,250,250)
+        socket.send(JSON.stringify({
+            data: data
+        }))
     }
 
     relativePos(event, element) {
@@ -54,8 +68,8 @@ class CanvasSection extends Component {
         return (
             <canvas 
                 ref="canvas"
-                width="500" 
-                height="500" 
+                width="250" 
+                height="250" 
                 style={{'border': '1px solid #000000'}}
                 onMouseDown={this.onMouseDown}
                 onMouseMove={this.onMouseMove}

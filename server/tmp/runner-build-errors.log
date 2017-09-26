@@ -1,0 +1,2 @@
+# github.com/laaksomavrick/paint-app/server
+./main.go:6:2: imported and not used: "fmt"

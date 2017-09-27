@@ -48,10 +48,15 @@ class CanvasSection extends Component {
 
         //may need a better strategy than updating whole canvas per stroke
 
+        //on conn, add user to list of clients
+
+        //broadcast each event of type update to all clients
+
         const { socket } = this.props   
-        const cx = this.refs.canvas.getContext('2d')
-        const data = cx.getImageData(0,0,250,250)
+        const canvas = this.refs.canvas
+        const data = canvas.toDataURL()
         socket.send(JSON.stringify({
+            type: 'update',
             data: data
         }))
     }

@@ -36,7 +36,7 @@ class App extends Component {
         }
 
         socket.onmessage = (e) => {
-            console.log("on message")
+            console.log("on message, now update with data")
         }
 
     }

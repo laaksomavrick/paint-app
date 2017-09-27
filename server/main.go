@@ -2,8 +2,6 @@ package main
 
 import (
 	"net/http"
-	"golang.org/x/net/websocket"
-	"fmt"
 )
 
 const (
@@ -12,6 +10,6 @@ const (
 )
 
 func main() {
-	http.Handle("/", websocket.Handler(NewConnection))
+	http.HandleFunc("/", handler)
 	http.ListenAndServe(PORT, nil)
 }

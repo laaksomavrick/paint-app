@@ -1,38 +1,54 @@
 package main
 
 import (
-	"golang.org/x/net/websocket"
+	"github.com/gorilla/websocket"
+	"fmt"
+	"net/http"
 )
 
-func NewConnection(ws *websocket.Conn) {
+var upgrader = websocket.Upgrader{
+    ReadBufferSize:  1024,
+    WriteBufferSize: 1024,
+}
 
-    // var err error
+// type Client struct {
+// 	hub *Hub
 
-    // for {
-    //     var reply string
+// 	// The websocket connection.
+// 	conn *websocket.Conn
 
-    //     if err = websocket.Message.Receive(ws, &reply); err != nil {
-    //         fmt.Println("Can't receive")
-    //         break
-    //     }
+// 	// Buffered channel of outbound messages.
+// 	send chan []byte
 
-    //     fmt.Println("Received back from client: " + reply)
+// }
 
-    //     msg := "Received:  " + reply
-    //     fmt.Println("Sending to client: " + msg)
+func handler(w http.ResponseWriter, r *http.Request) {
 
-    //     if err = websocket.Message.Send(ws, msg); err != nil {
-    //         fmt.Println("Can't send")
-    //         break
-    //     }
-	// }
+	conn, err := upgrader.Upgrade(w, r, nil)
+	
+    if err != nil {
+        fmt.Println(err)
+        return
+	}
 
-	//subscribe to paint
+	//Conceptually, as a first step, i need:
+		//a way to register clients on connect
+		//a way to deregister clients on disconnect
+		//a way to receive events from clients (pub)
+		//a way to broadcast events to clients (sub)
 
-	//send current state of paint
+	//client := &Client{hub: hub, conn: conn, send: make(chan []byte, 256)}
+	//client.hub.register <- client
+	
+	for {
+		messageType, p, err := conn.ReadMessage()
+		if err != nil {
+			return
+		}
+		if err := conn.WriteMessage(messageType, p); err != nil {
+			return
+		}
+	}
 
-	//differentiate channels for incoming & outgoing messages
-
-	//listen for events from socket or from paint
-
+    //... Use conn to send and receive messages.
 }

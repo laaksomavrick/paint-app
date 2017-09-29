@@ -14,19 +14,6 @@ var upgrader = websocket.Upgrader{
     },
 }
 
-var clients = make([]*Client, 0)
-
-type Client struct {
-	//hub *Hub
-
-	// The websocket connection.
-	conn *websocket.Conn
-
-	// Buffered channel of outbound messages.
-	//send chan []byte
-
-}
-
 func handler(w http.ResponseWriter, r *http.Request) {
 
 	conn, err := upgrader.Upgrade(w, r, nil)
@@ -35,6 +22,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
         fmt.Println(err)
         return
 	}
+	
 	//Conceptually, as a first step, i need:
 		//a way to register clients on connect
 		//a way to deregister clients on disconnect

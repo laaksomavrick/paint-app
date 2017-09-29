@@ -10,12 +10,37 @@ class CanvasSection extends Component {
         this.onMouseDown = this.onMouseDown.bind(this)
         this.onMouseMove = this.onMouseMove.bind(this)     
         this.onMouseUp = this.onMouseUp.bind(this) 
-        this.update = this.update.bind(this)         
+        this.emit = this.emit.bind(this)         
         this.relativePos = this.relativePos.bind(this) 
     }
 
     componentDidMount() {
-        //get canvas state from server
+
+        //pull this to container when making grid
+        //make this component visual, container will have state obj of canvas data
+
+        const { socket } = this.props 
+
+        socket.onopen = (e) => {
+            console.log("on open")
+        }
+
+        socket.onmessage = (e) => {
+            console.log("on message, now update with data")
+            const data = JSON.parse(e.data)
+            console.log(data.canvas)
+
+            const canvas = this.refs.canvas
+            const cx = canvas.getContext('2d')
+
+            var img = new Image();
+            img.onload = () => {
+                cx.drawImage(img,0,0);                
+            }
+            img.src = data.canvas
+
+        }
+
     }
 
     onMouseDown(e) {
@@ -40,24 +65,18 @@ class CanvasSection extends Component {
     }
 
     onMouseUp(e) {
-        this.update()        
+        this.emit()        
         this.setState({trackMouseMovement: false})
     }
 
-    update() {
-
-        //may need a better strategy than updating whole canvas per stroke
-
-        //on conn, add user to list of clients
-
-        //broadcast each event of type update to all clients
+    emit() {
 
         const { socket } = this.props   
         const canvas = this.refs.canvas
         const data = canvas.toDataURL()
         socket.send(JSON.stringify({
-            type: 'update',
-            data: data
+            event: 'update',
+            canvas: data
         }))
     }
 

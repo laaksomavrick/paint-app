@@ -31,14 +31,6 @@ class App extends Component {
         //     .then(res => res.json())
         //     .then(json => console.log(json));
 
-        socket.onopen = (e) => {
-            console.log("on open")
-        }
-
-        socket.onmessage = (e) => {
-            console.log("on message, now update with data")
-        }
-
     }
 
     handleMessage(e) {

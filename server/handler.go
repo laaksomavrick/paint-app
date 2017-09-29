@@ -8,19 +8,24 @@ import (
 
 var upgrader = websocket.Upgrader{
     ReadBufferSize:  1024,
-    WriteBufferSize: 1024,
+	WriteBufferSize: 1024,
+	CheckOrigin: func(r *http.Request) bool {
+        return true
+    },
 }
 
-// type Client struct {
-// 	hub *Hub
+var clients = make([]*Client, 0)
 
-// 	// The websocket connection.
-// 	conn *websocket.Conn
+type Client struct {
+	//hub *Hub
 
-// 	// Buffered channel of outbound messages.
-// 	send chan []byte
+	// The websocket connection.
+	conn *websocket.Conn
 
-// }
+	// Buffered channel of outbound messages.
+	//send chan []byte
+
+}
 
 func handler(w http.ResponseWriter, r *http.Request) {
 
@@ -30,24 +35,37 @@ func handler(w http.ResponseWriter, r *http.Request) {
         fmt.Println(err)
         return
 	}
-
 	//Conceptually, as a first step, i need:
 		//a way to register clients on connect
 		//a way to deregister clients on disconnect
 		//a way to receive events from clients (pub)
 		//a way to broadcast events to clients (sub)
 
-	//client := &Client{hub: hub, conn: conn, send: make(chan []byte, 256)}
+	client := &Client{conn: conn}
+	clients = append(clients, client)
+
 	//client.hub.register <- client
 	
 	for {
-		messageType, p, err := conn.ReadMessage()
+
+		//todo handle client disconnect
+
+		var m interface{}
+
+		err := conn.ReadJSON(&m)
 		if err != nil {
-			return
+			fmt.Println(err)
 		}
-		if err := conn.WriteMessage(messageType, p); err != nil {
-			return
+
+		fmt.Println(clients)
+
+		for _, client := range clients {
+			if err := client.conn.WriteJSON(m); err != nil {
+				fmt.Println(err)
+				//return
+			}
 		}
+
 	}
 
     //... Use conn to send and receive messages.

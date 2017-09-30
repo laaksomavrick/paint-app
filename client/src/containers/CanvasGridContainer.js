@@ -32,14 +32,18 @@ class CanvasGridContainer extends Component {
             console.log("on message, now update with data")
             const data = JSON.parse(e.data)
 
-            const canvas = document.getElementById(data.id)
-            const cx = canvas.getContext('2d')
+            if (data) {
 
-            var img = new Image();
-            img.onload = () => {
-                cx.drawImage(img,0,0);                
+                const canvas = document.getElementById(data.id)
+                const cx = canvas.getContext('2d')
+    
+                var img = new Image();
+                img.onload = () => {
+                    cx.drawImage(img,0,0);                
+                }
+                img.src = data.canvas
+
             }
-            img.src = data.canvas
 
         }
 

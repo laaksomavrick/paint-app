@@ -22,12 +22,6 @@ func handler(w http.ResponseWriter, r *http.Request) {
         fmt.Println(err)
         return
 	}
-	
-	//Conceptually, as a first step, i need:
-		//a way to register clients on connect
-		//a way to deregister clients on disconnect
-		//a way to receive events from clients (pub)
-		//a way to broadcast events to clients (sub)
 
 	client := &Client{conn: conn}
 	clients = append(clients, client)
@@ -35,8 +29,6 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	//client.hub.register <- client
 	
 	for {
-
-		//todo handle client disconnect
 
 		var m interface{}
 
@@ -47,14 +39,17 @@ func handler(w http.ResponseWriter, r *http.Request) {
 
 		fmt.Println(clients)
 
-		for _, client := range clients {
+		for i, client := range clients {
 			if err := client.conn.WriteJSON(m); err != nil {
-				fmt.Println(err)
-				//return
+				//they disconnected
+				_ := client.conn.Close()
+				copy(clients[i:], clients[i+1:])
+				clients[len(clients)-1] = nil
+				clients = clients[:len(clients)-1]
+				return
 			}
 		}
 
 	}
 
-    //... Use conn to send and receive messages.
 }

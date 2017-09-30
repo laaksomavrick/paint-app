@@ -1,11 +1,13 @@
-import React, { Component } from 'react';
+import React, { Component } from 'react'
+import { CanvasGrid } from '../components/CanvasGrid'
 
-class CanvasSection extends Component {  
+class CanvasGridContainer extends Component {  
 
     constructor(props) {
         super(props)
         this.state = {
-            trackMouseMovement: false
+            trackMouseMovement: false,
+            canvasGrid: []
         }
         this.onMouseDown = this.onMouseDown.bind(this)
         this.onMouseMove = this.onMouseMove.bind(this)     
@@ -16,8 +18,7 @@ class CanvasSection extends Component {
 
     componentDidMount() {
 
-        //pull this to container when making grid
-        //make this component visual, container will have state obj of canvas data
+        //need to figure out better way than getElementById
 
         const { socket } = this.props 
 
@@ -28,9 +29,8 @@ class CanvasSection extends Component {
         socket.onmessage = (e) => {
             console.log("on message, now update with data")
             const data = JSON.parse(e.data)
-            console.log(data.canvas)
 
-            const canvas = this.refs.canvas
+            const canvas = document.getElementById(data.id)
             const cx = canvas.getContext('2d')
 
             var img = new Image();
@@ -43,17 +43,18 @@ class CanvasSection extends Component {
 
     }
 
-    onMouseDown(e) {
-        const cx = this.refs.canvas.getContext('2d')
+    onMouseDown(e, id) {
+
+        const cx = document.getElementById(id).getContext('2d')
         const pos = this.relativePos(e, cx.canvas)
 
         cx.moveTo(pos.x, pos.y)       
         this.setState({trackMouseMovement: true})
     }
 
-    onMouseMove(e) {
+    onMouseMove(e, id) {
         if (this.state.trackMouseMovement) {
-            const cx = this.refs.canvas.getContext('2d')
+            const cx = document.getElementById(id).getContext('2d')
             const pos = this.relativePos(e, cx.canvas)
 
             cx.lineJoin = 'round'
@@ -64,18 +65,19 @@ class CanvasSection extends Component {
         }   
     }
 
-    onMouseUp(e) {
-        this.emit()        
+    onMouseUp(e, id) {
+        this.emit(id)        
         this.setState({trackMouseMovement: false})
     }
 
-    emit() {
+    emit(id) {
 
         const { socket } = this.props   
-        const canvas = this.refs.canvas
+        const canvas = document.getElementById(id)
         const data = canvas.toDataURL()
         socket.send(JSON.stringify({
             event: 'update',
+            id: id,
             canvas: data
         }))
     }
@@ -89,19 +91,25 @@ class CanvasSection extends Component {
     }
 
     render() {
+
+        //const canvasGrid = this.state.canvasGrid
+
+        const canvasGrid = [
+            {},
+            {},
+            {}
+        ]
+
         return (
-            <canvas 
-                ref="canvas"
-                width="250" 
-                height="250" 
-                style={{'border': '1px solid #000000'}}
+            <CanvasGrid 
+                canvasGrid={canvasGrid}
                 onMouseDown={this.onMouseDown}
                 onMouseMove={this.onMouseMove}
-                onMouseUp={this.onMouseUp}>
-            </canvas>
+                onMouseUp={this.onMouseUp}
+            />
         )
     }
 
 }
 
-export default CanvasSection;
+export default CanvasGridContainer

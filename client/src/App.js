@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import CanvasSection from './containers/CanvasSection'
+import CanvasGridContainer from './containers/CanvasGridContainer'
 
 const socket = new WebSocket('ws://localhost:3001')
 
@@ -20,29 +20,10 @@ class App extends Component {
 
     //Tools (affect conf of drawing, toggle draw vs drag mode)
 
-    constructor(props) {
-        super(props)
-        this.state = {}
-    }
-
-    componentDidMount() {
-
-        // fetch('/users')
-        //     .then(res => res.json())
-        //     .then(json => console.log(json));
-
-    }
-
-    handleMessage(e) {
-
-        console.log("here")
-
-    }
-
     render() {
         return (
             <div className="App">
-                <CanvasSection socket={socket}/>
+                <CanvasGridContainer socket={socket}/>
             </div>
         );
     }

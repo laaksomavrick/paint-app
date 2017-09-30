@@ -7,6 +7,10 @@ class CanvasGridContainer extends Component {
         super(props)
         this.state = {
             trackMouseMovement: false,
+            previousX: null,
+            previousY: null,
+            movementAxis: null,
+            loaded: false,
             canvasGrid: []
         }
         this.onMouseDown = this.onMouseDown.bind(this)
@@ -16,26 +20,33 @@ class CanvasGridContainer extends Component {
         this.onMouseEnter = this.onMouseEnter.bind(this)                 
         this.emit = this.emit.bind(this)         
         this.relativePos = this.relativePos.bind(this) 
-        this.boundedPos = this.boundedPos.bind(this)         
+        this.boundedPos = this.boundedPos.bind(this)    
+        this.setMovementAxis = this.setMovementAxis.bind(this)
+        this.getCanvas = this.getCanvas.bind(this)  
     }
 
     componentDidMount() {
 
         //need to figure out better way than getElementById
+            //won't be ncessary once server call init
+            //can just update 
+            //update Canvas to use ref, local variable dicated by state for dataURL?
 
         const { socket } = this.props 
 
         socket.onopen = (e) => {
+
             console.log("on open")
+
         }
 
         socket.onmessage = (e) => {
-            console.log("on message, now update with data")
+
             const data = JSON.parse(e.data)
 
             if (data) {
 
-                const canvas = document.getElementById(data.id)
+                const canvas = this.getCanvas(data.id)
                 const cx = canvas.getContext('2d')
     
                 var img = new Image();
@@ -52,7 +63,7 @@ class CanvasGridContainer extends Component {
 
     onMouseDown(e, id) {
 
-        const cx = document.getElementById(id).getContext('2d')
+        const cx = this.getCanvas(id).getContext('2d')
         const pos = this.relativePos(e, cx.canvas)
 
         cx.moveTo(pos.x, pos.y)       
@@ -60,38 +71,42 @@ class CanvasGridContainer extends Component {
     }
 
     onMouseMove(e, id) {
+
         if (this.state.trackMouseMovement) {
-            const cx = document.getElementById(id).getContext('2d')
+
+            const cx =this.getCanvas(id).getContext('2d')
             const pos = this.relativePos(e, cx.canvas)
+
+            this.setMovementAxis(pos)       
 
             cx.lineJoin = 'round'
             cx.lineWidth = 5
                         
             cx.lineTo(pos.x, pos.y)
             cx.stroke()
-            console.log("on mouse move")
-        }   
+        } 
+
     }
 
     onMouseEnter(e, id) {
         if (this.state.trackMouseMovement) {
 
-            const cx = document.getElementById(id).getContext('2d')
+            const cx = this.getCanvas(id).getContext('2d')
             const pos = this.boundedPos(e, cx.canvas)
             cx.moveTo(pos.x, pos.y)
-            console.log("on mouse enter")
+            console.log("on mouse enter: " + this.state.movementAxis)
 
         }
     }
 
     onMouseLeave(e, id) {
         if (this.state.trackMouseMovement) {
-            const cx = document.getElementById(id).getContext('2d')
+            const cx = this.getCanvas(id).getContext('2d')
             const pos = this.boundedPos(e, cx.canvas)
             cx.lineTo(pos.x, pos.y)
             cx.stroke()
             this.emit(id)
-            console.log("on mouse leave")
+            console.log("on mouse leave: " + this.state.movementAxis)
         }
     }
 
@@ -103,7 +118,7 @@ class CanvasGridContainer extends Component {
     emit(id) {
 
         const { socket } = this.props   
-        const canvas = document.getElementById(id)
+        const canvas = this.getCanvas(id)
         const data = canvas.toDataURL()
         socket.send(JSON.stringify({
             event: 'update',
@@ -121,19 +136,45 @@ class CanvasGridContainer extends Component {
     }
 
     boundedPos(event, element) {
-        var rect = element.getBoundingClientRect()
-            
+
+        const rect = element.getBoundingClientRect()
+        const movementAxis = this.state.movementAxis        
+
         let estX = Math.floor(event.clientX - rect.left)            
         let estY = Math.floor(event.clientY - rect.top)
 
-        if (estX >= 128) { estX = 255}
-        if (estX <= 127) { estX = 0}
+        if (movementAxis == 'x') {
+            if (estX >= 128) { estX = 255} else { estX = 0 }
+        } else if (movementAxis == 'y') {
+            if (estY >= 128) { estY = 255} else { estY = 0 }
+        }
     
-            return {
-                x: estX,
-                y: estY
-            }
+        return { x: estX, y: estY }
 
+    }
+
+    setMovementAxis(pos) {
+
+        const previousX = this.state.previousX
+        const previousY = this.state.previousY
+
+        const amplitudeX = Math.abs(previousX - pos.x)
+        const amplitudeY = Math.abs(previousY - pos.y)            
+
+        if (amplitudeX >= amplitudeY) {
+            this.setState({movementAxis: 'x'})
+        } else {
+            this.setState({movementAxis: 'y'})
+        }
+
+        this.setState({previousX: pos.x})
+        this.setState({previousY: pos.y})   
+
+    }
+
+    getCanvas(id) {
+        const canvas = document.getElementById(id)
+        return canvas
     }
 
     render() {

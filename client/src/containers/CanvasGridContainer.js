@@ -12,6 +12,8 @@ class CanvasGridContainer extends Component {
         this.onMouseDown = this.onMouseDown.bind(this)
         this.onMouseMove = this.onMouseMove.bind(this)     
         this.onMouseUp = this.onMouseUp.bind(this) 
+        this.onMouseLeave = this.onMouseLeave.bind(this)   
+        this.onMouseEnter = this.onMouseEnter.bind(this)                 
         this.emit = this.emit.bind(this)         
         this.relativePos = this.relativePos.bind(this) 
     }
@@ -65,6 +67,16 @@ class CanvasGridContainer extends Component {
         }   
     }
 
+    onMouseEnter(e, id) {
+        const cx = document.getElementById(id).getContext('2d')
+        const pos = this.relativePos(e, cx.canvas)
+        cx.moveTo(pos.x, pos.y)
+    }
+
+    onMouseLeave(e, id) {
+        this.emit(id)
+    }
+
     onMouseUp(e, id) {
         this.emit(id)        
         this.setState({trackMouseMovement: false})
@@ -106,6 +118,8 @@ class CanvasGridContainer extends Component {
                 onMouseDown={this.onMouseDown}
                 onMouseMove={this.onMouseMove}
                 onMouseUp={this.onMouseUp}
+                onMouseLeave={this.onMouseLeave}
+                onMouseEnter={this.onMouseEnter}
             />
         )
     }

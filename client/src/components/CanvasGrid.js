@@ -1,7 +1,7 @@
 import React from 'react'
 import { Canvas } from './Canvas'
 
-export const CanvasGrid = ({ canvasGrid, onMouseDown, onMouseMove, onMouseUp }) => (
+export const CanvasGrid = ({ canvasGrid, onMouseDown, onMouseMove, onMouseUp, onMouseLeave, onMouseEnter }) => (
 
     <div>
         {
@@ -15,6 +15,8 @@ export const CanvasGrid = ({ canvasGrid, onMouseDown, onMouseMove, onMouseUp }) 
                     onMouseDown={onMouseDown}
                     onMouseMove={onMouseMove}
                     onMouseUp={onMouseUp}
+                    onMouseLeave={onMouseLeave}
+                    onMouseEnter={onMouseEnter}
                     />
                 )
             )

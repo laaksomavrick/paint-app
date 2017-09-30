@@ -24,5 +24,3 @@ export const CanvasGrid = ({ canvasGrid, onMouseDown, onMouseMove, onMouseUp, on
     </div>
 
 )
-
-//onClick={() => onRoomListItemClick(data.id)}

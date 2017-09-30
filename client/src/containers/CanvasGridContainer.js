@@ -16,6 +16,7 @@ class CanvasGridContainer extends Component {
         this.onMouseEnter = this.onMouseEnter.bind(this)                 
         this.emit = this.emit.bind(this)         
         this.relativePos = this.relativePos.bind(this) 
+        this.boundedPos = this.boundedPos.bind(this)         
     }
 
     componentDidMount() {
@@ -68,17 +69,30 @@ class CanvasGridContainer extends Component {
                         
             cx.lineTo(pos.x, pos.y)
             cx.stroke()
+            console.log("on mouse move")
         }   
     }
 
     onMouseEnter(e, id) {
-        const cx = document.getElementById(id).getContext('2d')
-        const pos = this.relativePos(e, cx.canvas)
-        cx.moveTo(pos.x, pos.y)
+        if (this.state.trackMouseMovement) {
+
+            const cx = document.getElementById(id).getContext('2d')
+            const pos = this.boundedPos(e, cx.canvas)
+            cx.moveTo(pos.x, pos.y)
+            console.log("on mouse enter")
+
+        }
     }
 
     onMouseLeave(e, id) {
-        this.emit(id)
+        if (this.state.trackMouseMovement) {
+            const cx = document.getElementById(id).getContext('2d')
+            const pos = this.boundedPos(e, cx.canvas)
+            cx.lineTo(pos.x, pos.y)
+            cx.stroke()
+            this.emit(id)
+            console.log("on mouse leave")
+        }
     }
 
     onMouseUp(e, id) {
@@ -99,11 +113,27 @@ class CanvasGridContainer extends Component {
     }
 
     relativePos(event, element) {
-        var rect = element.getBoundingClientRect();
+        var rect = element.getBoundingClientRect()
         return {
             x: Math.floor(event.clientX - rect.left),
             y: Math.floor(event.clientY - rect.top)
         }
+    }
+
+    boundedPos(event, element) {
+        var rect = element.getBoundingClientRect()
+            
+        let estX = Math.floor(event.clientX - rect.left)            
+        let estY = Math.floor(event.clientY - rect.top)
+
+        if (estX >= 128) { estX = 255}
+        if (estX <= 127) { estX = 0}
+    
+            return {
+                x: estX,
+                y: estY
+            }
+
     }
 
     render() {

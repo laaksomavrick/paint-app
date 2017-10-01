@@ -37,12 +37,12 @@ func handler(w http.ResponseWriter, r *http.Request) {
 			fmt.Println(err)
 		}
 
-		fmt.Println(clients)
-
 		for i, client := range clients {
 			if err := client.conn.WriteJSON(m); err != nil {
 				//they disconnected
-				_ := client.conn.Close()
+				if err := client.conn.Close(); err != nil {
+					fmt.Println(err)					
+				}
 				copy(clients[i:], clients[i+1:])
 				clients[len(clients)-1] = nil
 				clients = clients[:len(clients)-1]

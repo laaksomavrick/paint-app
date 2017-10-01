@@ -9,6 +9,7 @@ export const CanvasGrid = ({ canvasGrid, onMouseDown, onMouseMove, onMouseUp, on
                 <Canvas 
                     key={index}
                     id={index}
+                    canvasData={canvas}
                     width='250'
                     height='250'
                     style={{'border': '1px solid #000000'}}

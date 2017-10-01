@@ -46,10 +46,12 @@ class CanvasGridContainer extends Component {
 
             if (data) {
 
+                //UPDATE CANVASDATA
+
                 const canvas = this.getCanvas(data.id)
                 const cx = canvas.getContext('2d')
     
-                var img = new Image();
+                var img = new Image()
                 img.onload = () => {
                     cx.drawImage(img,0,0);                
                 }
@@ -182,6 +184,27 @@ class CanvasGridContainer extends Component {
         //const canvasGrid = this.state.canvasGrid
 
         const canvasGrid = [
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
             {},
             {},
             {}

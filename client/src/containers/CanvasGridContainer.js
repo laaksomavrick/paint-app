@@ -42,24 +42,26 @@ class CanvasGridContainer extends Component {
 
             const message = JSON.parse(e.data)
 
+            console.log("on message")
+
+            console.log(message)
+
             if (message) {
 
                 if (message.Event == 'update') {
-
-                    const canvas = this.getCanvas(message.Data.id)
-                    const cx = canvas.getContext('2d')
         
-                    var img = new Image()
-                    img.onload = () => {
-                        cx.drawImage(img,0,0);                
-                    }
-                    img.src = message.data.canvas
+                    const updatedCanvas = {Id: message.Id, Src: message.Src}
+                    let canvasGrid = this.state.canvasGrid
+                    canvasGrid[message.Id] = updatedCanvas
+                    this.setState({canvasGrid: canvasGrid})
 
                 } else if (message.Event == 'get') {
 
-                    this.setState({canvasGrid: message.Data})
+                    this.setState({canvasGrid: message.CanvasGrid})
 
                 }
+
+                console.log(this.state.canvasGrid)
 
             }
 
@@ -128,7 +130,8 @@ class CanvasGridContainer extends Component {
         const data = canvas.toDataURL()
         socket.send(JSON.stringify({
             Event: 'update',
-            Data: {Id: id, Src: canvas}
+            Id: id, 
+            Src: data
         }))
     }
 

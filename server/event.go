@@ -2,5 +2,7 @@ package main
 
 type Event struct {
 	Event string
-	Data interface{}
+	Id int
+	Src string
+	CanvasGrid []Canvas
 }

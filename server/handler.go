@@ -28,22 +28,35 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	clients = append(clients, client)
 
 	//send current grid state
-	archive := Event{Event: "get", Data: canvases}
+	archive := Event{Event: "get", CanvasGrid: canvases, Id: -1, Src: ""}
 	if err := client.conn.WriteJSON(archive); err != nil {
 		fmt.Println(err)
 	}
 	
 	for {
 
-		var m interface{}
+		var event Event
 
-		err := conn.ReadJSON(&m)
+		err := conn.ReadJSON(&event)
 		if err != nil {
 			fmt.Println(err)
 		}
 
+		//update in memory archive
+		if (event.Event == "update") {
+			canvas := Canvas{Id: event.Id, Src: event.Src}
+			for index, value := range canvases {
+				if value.Id == canvas.Id {
+					canvases[index] = canvas
+				}
+			}
+		}
+
 		for i, client := range clients {
-			if err := client.conn.WriteJSON(m); err != nil {
+
+			//exclude current client
+
+			if err := client.conn.WriteJSON(event); err != nil {
 				//they disconnected
 				if err := client.conn.Close(); err != nil {
 					fmt.Println(err)					

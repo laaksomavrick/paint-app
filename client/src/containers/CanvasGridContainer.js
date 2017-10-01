@@ -36,26 +36,30 @@ class CanvasGridContainer extends Component {
 
         socket.onopen = (e) => {
 
-            console.log("on open")
-
         }
 
         socket.onmessage = (e) => {
 
-            const data = JSON.parse(e.data)
+            const message = JSON.parse(e.data)
 
-            if (data) {
+            if (message) {
 
-                //UPDATE CANVASDATA
+                if (message.Event == 'update') {
 
-                const canvas = this.getCanvas(data.id)
-                const cx = canvas.getContext('2d')
-    
-                var img = new Image()
-                img.onload = () => {
-                    cx.drawImage(img,0,0);                
+                    const canvas = this.getCanvas(message.Data.id)
+                    const cx = canvas.getContext('2d')
+        
+                    var img = new Image()
+                    img.onload = () => {
+                        cx.drawImage(img,0,0);                
+                    }
+                    img.src = message.data.canvas
+
+                } else if (message.Event == 'get') {
+
+                    this.setState({canvasGrid: message.Data})
+
                 }
-                img.src = data.canvas
 
             }
 
@@ -123,9 +127,8 @@ class CanvasGridContainer extends Component {
         const canvas = this.getCanvas(id)
         const data = canvas.toDataURL()
         socket.send(JSON.stringify({
-            event: 'update',
-            id: id,
-            canvas: data
+            Event: 'update',
+            Data: {Id: id, Src: canvas}
         }))
     }
 
@@ -181,34 +184,7 @@ class CanvasGridContainer extends Component {
 
     render() {
 
-        //const canvasGrid = this.state.canvasGrid
-
-        const canvasGrid = [
-            {},
-            {},
-            {},
-            {},
-            {},
-            {},
-            {},
-            {},
-            {},
-            {},
-            {},
-            {},
-            {},
-            {},
-            {},
-            {},
-            {},
-            {},
-            {},
-            {},
-            {},
-            {},
-            {},
-            {}
-        ]
+        const canvasGrid = this.state.canvasGrid
 
         return (
             <CanvasGrid 

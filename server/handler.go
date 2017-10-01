@@ -23,10 +23,15 @@ func handler(w http.ResponseWriter, r *http.Request) {
         return
 	}
 
+	//register client
 	client := &Client{conn: conn}
 	clients = append(clients, client)
 
-	//client.hub.register <- client
+	//send current grid state
+	archive := Event{Event: "get", Data: canvases}
+	if err := client.conn.WriteJSON(archive); err != nil {
+		fmt.Println(err)
+	}
 	
 	for {
 

@@ -1,26 +1,26 @@
 package main
 
 import (
-	"github.com/gorilla/websocket"
 	"fmt"
+	"github.com/gorilla/websocket"
 	"net/http"
 )
 
 var upgrader = websocket.Upgrader{
-    ReadBufferSize:  1024,
+	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
 	CheckOrigin: func(r *http.Request) bool {
-        return true
-    },
+		return true
+	},
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
 
 	conn, err := upgrader.Upgrade(w, r, nil)
-	
-    if err != nil {
-        fmt.Println(err)
-        return
+
+	if err != nil {
+		fmt.Println(err)
+		return
 	}
 
 	//register client
@@ -32,18 +32,19 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	if err := client.conn.WriteJSON(archive); err != nil {
 		fmt.Println(err)
 	}
-	
+
 	for {
 
 		var event Event
 
+		//read event from client
 		err := conn.ReadJSON(&event)
 		if err != nil {
 			fmt.Println(err)
 		}
 
 		//update in memory archive
-		if (event.Event == "update") {
+		if event.Event == "update" {
 			canvas := Canvas{Id: event.Id, Src: event.Src}
 			for index, value := range canvases {
 				if value.Id == canvas.Id {
@@ -52,14 +53,13 @@ func handler(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
-		for i, client := range clients {
+		//update clients
+		for i, value := range clients {
 
-			//exclude current client
-
-			if err := client.conn.WriteJSON(event); err != nil {
+			if err := value.conn.WriteJSON(event); err != nil {
 				//they disconnected
-				if err := client.conn.Close(); err != nil {
-					fmt.Println(err)					
+				if err := value.conn.Close(); err != nil {
+					fmt.Println(err)
 				}
 				copy(clients[i:], clients[i+1:])
 				clients[len(clients)-1] = nil

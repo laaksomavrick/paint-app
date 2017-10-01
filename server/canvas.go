@@ -1,7 +1,7 @@
 package main
 
 type Canvas struct {
-	Id int
+	Id  int
 	Src string
 }
 
@@ -12,7 +12,7 @@ func getInitialPaintState() []Canvas {
 	for i := 0; i < 128; i++ {
 		canvas := Canvas{Id: i, Src: ""}
 		canvases = append(canvases, canvas)
-    }
+	}
 
 	return canvases
 

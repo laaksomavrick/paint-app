@@ -27,24 +27,11 @@ class CanvasGridContainer extends Component {
 
     componentDidMount() {
 
-        //need to figure out better way than getElementById
-            //won't be ncessary once server call init
-            //can just update 
-            //update Canvas to use ref, local variable dicated by state for dataURL?
-
         const { socket } = this.props 
-
-        socket.onopen = (e) => {
-
-        }
 
         socket.onmessage = (e) => {
 
             const message = JSON.parse(e.data)
-
-            console.log("on message")
-
-            console.log(message)
 
             if (message) {
 
@@ -60,8 +47,6 @@ class CanvasGridContainer extends Component {
                     this.setState({canvasGrid: message.CanvasGrid})
 
                 }
-
-                console.log(this.state.canvasGrid)
 
             }
 
@@ -97,30 +82,33 @@ class CanvasGridContainer extends Component {
     }
 
     onMouseEnter(e, id) {
+
         if (this.state.trackMouseMovement) {
 
             const cx = this.getCanvas(id).getContext('2d')
             const pos = this.boundedPos(e, cx.canvas)
             cx.moveTo(pos.x, pos.y)
-            console.log("on mouse enter: " + this.state.movementAxis)
-
         }
+
     }
 
     onMouseLeave(e, id) {
+
         if (this.state.trackMouseMovement) {
             const cx = this.getCanvas(id).getContext('2d')
             const pos = this.boundedPos(e, cx.canvas)
             cx.lineTo(pos.x, pos.y)
             cx.stroke()
             this.emit(id)
-            console.log("on mouse leave: " + this.state.movementAxis)
         }
+
     }
 
     onMouseUp(e, id) {
+
         this.emit(id)        
         this.setState({trackMouseMovement: false})
+
     }
 
     emit(id) {
@@ -133,14 +121,18 @@ class CanvasGridContainer extends Component {
             Id: id, 
             Src: data
         }))
+
     }
 
     relativePos(event, element) {
+
         var rect = element.getBoundingClientRect()
+
         return {
             x: Math.floor(event.clientX - rect.left),
             y: Math.floor(event.clientY - rect.top)
         }
+
     }
 
     boundedPos(event, element) {
@@ -157,7 +149,10 @@ class CanvasGridContainer extends Component {
             if (estY >= 128) { estY = 255} else { estY = 0 }
         }
     
-        return { x: estX, y: estY }
+        return { 
+            x: estX, 
+            y: estY 
+        }
 
     }
 
@@ -181,8 +176,10 @@ class CanvasGridContainer extends Component {
     }
 
     getCanvas(id) {
+
         const canvas = document.getElementById(id)
         return canvas
+
     }
 
     render() {
@@ -199,6 +196,7 @@ class CanvasGridContainer extends Component {
                 onMouseEnter={this.onMouseEnter}
             />
         )
+        
     }
 
 }

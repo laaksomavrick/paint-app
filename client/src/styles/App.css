@@ -1,0 +1,7 @@
+html, body {
+    overflow: hidden;    
+}
+
+.container {
+    width: 6000px;
+}

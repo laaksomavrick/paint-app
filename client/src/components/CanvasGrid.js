@@ -3,7 +3,7 @@ import Canvas from './Canvas'
 
 export const CanvasGrid = ({ canvasGrid, onMouseDown, onMouseMove, onMouseUp, onMouseLeave, onMouseEnter }) => (
 
-    <div>
+    <div className="container">
         {
             canvasGrid.map((canvas, index) => (
                 <Canvas 

@@ -3,5 +3,13 @@ html, body {
 }
 
 .container {
-    width: 6000px;
+    /* width: 6000px; */
+    display: flex;
+}
+
+canvas {
+    margin-right:-5px;
+    margin-left:-5px;
+    padding:0px;
+    vertical-align: bottom;
 }

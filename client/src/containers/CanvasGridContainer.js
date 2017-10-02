@@ -73,7 +73,7 @@ class CanvasGridContainer extends Component {
             this.setMovementAxis(pos)       
 
             cx.lineJoin = 'round'
-            cx.lineWidth = 5
+            cx.lineWidth = 7
                         
             cx.lineTo(pos.x, pos.y)
             cx.stroke()
@@ -88,6 +88,9 @@ class CanvasGridContainer extends Component {
             const cx = this.getCanvas(id).getContext('2d')
             const pos = this.boundedPos(e, cx.canvas)
             cx.moveTo(pos.x, pos.y)
+
+            cx.lineTo(pos.x, pos.y)
+            cx.stroke()
         }
 
     }
@@ -96,9 +99,13 @@ class CanvasGridContainer extends Component {
 
         if (this.state.trackMouseMovement) {
             const cx = this.getCanvas(id).getContext('2d')
-            const pos = this.boundedPos(e, cx.canvas)
-            cx.lineTo(pos.x, pos.y)
-            cx.stroke()
+            const pos = this.relativePos(e, cx.canvas)
+
+            if (this.state.movementAxis == 'x') {
+                cx.lineTo(pos.x, pos.y)
+                cx.stroke()
+            }
+
             this.emit(id)
         }
 
@@ -138,16 +145,20 @@ class CanvasGridContainer extends Component {
     boundedPos(event, element) {
 
         const rect = element.getBoundingClientRect()
-        const movementAxis = this.state.movementAxis        
+        //const movementAxis = this.state.movementAxis        
 
         let estX = Math.floor(event.clientX - rect.left)            
         let estY = Math.floor(event.clientY - rect.top)
 
-        if (movementAxis == 'x') {
-            if (estX >= 128) { estX = 255} else { estX = 0 }
-        } else if (movementAxis == 'y') {
-            if (estY >= 128) { estY = 255} else { estY = 0 }
-        }
+        // if (movementAxis == 'x') {
+        //     if (estX >= 128) { estX = 255} else { estX = 0 }
+        // } else if (movementAxis == 'y') {
+        //     if (estY >= 128) { estY = 255} else { estY = 0 }
+        // }
+
+        if (estX >= 128) { estX = 255} else { estX = 2 }    
+        
+        console.log(estX)
     
         return { 
             x: estX, 

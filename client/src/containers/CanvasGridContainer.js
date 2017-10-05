@@ -73,7 +73,7 @@ class CanvasGridContainer extends Component {
             this.setMovementAxis(pos)       
 
             cx.lineJoin = 'round'
-            cx.lineWidth = 7
+            cx.lineWidth = 3
                         
             cx.lineTo(pos.x, pos.y)
             cx.stroke()
@@ -87,10 +87,16 @@ class CanvasGridContainer extends Component {
 
             const cx = this.getCanvas(id).getContext('2d')
             const pos = this.boundedPos(e, cx.canvas)
+            
             cx.moveTo(pos.x, pos.y)
-
             cx.lineTo(pos.x, pos.y)
             cx.stroke()
+
+            const relativePos = this.relativePos(e, cx.canvas)
+            cx.moveTo(relativePos.x, relativePos.y)
+            cx.lineTo(pos.x, pos.y)
+            cx.stroke()
+
         }
 
     }
@@ -98,16 +104,18 @@ class CanvasGridContainer extends Component {
     onMouseLeave(e, id) {
 
         if (this.state.trackMouseMovement) {
+            
             const cx = this.getCanvas(id).getContext('2d')
-            const pos = this.relativePos(e, cx.canvas)
+            const pos = this.boundedPos(e, cx.canvas)
 
             if (this.state.movementAxis == 'x') {
                 cx.lineTo(pos.x, pos.y)
                 cx.stroke()
             }
 
-            this.emit(id)
         }
+
+        this.emit(id)
 
     }
 
@@ -156,10 +164,8 @@ class CanvasGridContainer extends Component {
         //     if (estY >= 128) { estY = 255} else { estY = 0 }
         // }
 
-        if (estX >= 128) { estX = 255} else { estX = 2 }    
-        
-        console.log(estX)
-    
+        if (estX >= 128) { estX = 250 } else { estX = 0 }    
+            
         return { 
             x: estX, 
             y: estY 

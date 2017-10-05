@@ -14,7 +14,7 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
-func handler(w http.ResponseWriter, r *http.Request) {
+func handler(hub *Hub, w http.ResponseWriter, r *http.Request) {
 
 	conn, err := upgrader.Upgrade(w, r, nil)
 
@@ -24,8 +24,8 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//register client
-	client := &Client{conn: conn}
-	clients = append(clients, client)
+	client := &Client{hub: hub, conn: conn}
+	client.hub.register <- client
 
 	//send current grid state
 	archive := Event{Event: "get", CanvasGrid: canvases, Id: -1, Src: ""}
@@ -54,16 +54,16 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		//update clients
-		for i, value := range clients {
+		for i, value := range hub.clients {
 
 			if err := value.conn.WriteJSON(event); err != nil {
 				//they disconnected
 				if err := value.conn.Close(); err != nil {
 					fmt.Println(err)
 				}
-				copy(clients[i:], clients[i+1:])
-				clients[len(clients)-1] = nil
-				clients = clients[:len(clients)-1]
+				copy(hub.clients[i:], hub.clients[i+1:])
+				hub.clients[len(hub.clients)-1] = nil
+				hub.clients = hub.clients[:len(hub.clients)-1]
 				return
 			}
 		}

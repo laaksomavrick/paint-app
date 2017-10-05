@@ -5,7 +5,7 @@ import (
 )
 
 type Client struct {
-	//hub *Hub
+	hub *Hub
 
 	// The websocket connection.
 	conn *websocket.Conn

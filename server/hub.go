@@ -3,15 +3,15 @@ package main
 var canvases = getInitialPaintState()
 
 type Hub struct {
-	clients []*Client
-	register chan *Client
+	clients    map[*Client]bool
+	register   chan *Client
 	unregister chan *Client
 }
 
 func hub() *Hub {
 	return &Hub{
-		clients: make([]*Client, 0),
-		register: make(chan *Client),
+		clients:    make(map[*Client]bool),
+		register:   make(chan *Client),
 		unregister: make(chan *Client),
 	}
 }
@@ -24,7 +24,14 @@ func (h *Hub) run() {
 
 		case client := <-h.register:
 
-			h.clients = append(h.clients, client)
+			h.clients[client] = true
+
+		case client := <-h.unregister:
+			client.conn.Close()
+
+			if _, ok := h.clients[client]; ok {
+				delete(h.clients, client)
+			}
 
 		}
 

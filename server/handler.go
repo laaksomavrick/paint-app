@@ -54,16 +54,11 @@ func handler(hub *Hub, w http.ResponseWriter, r *http.Request) {
 		}
 
 		//update clients
-		for i, value := range hub.clients {
+		for client := range hub.clients {
 
-			if err := value.conn.WriteJSON(event); err != nil {
+			if err := client.conn.WriteJSON(event); err != nil {
 				//they disconnected
-				if err := value.conn.Close(); err != nil {
-					fmt.Println(err)
-				}
-				copy(hub.clients[i:], hub.clients[i+1:])
-				hub.clients[len(hub.clients)-1] = nil
-				hub.clients = hub.clients[:len(hub.clients)-1]
+				client.hub.unregister <- client
 				return
 			}
 		}
